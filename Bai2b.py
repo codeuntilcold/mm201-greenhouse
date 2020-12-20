@@ -16,8 +16,8 @@ def MC_PadAir_Lin(U_Pad, phi_Pad, A_Flr, CO2_Out):
 
 #####
 
-def f_ThScr(U_ThScr, K_ThScr, T_Air, T_Top, g, rho_Mean_Air, rho_Air, rho_Top):
-    result = U_ThScr * K_ThScr * abs(T_Air - T_Top)**(2/3) + (1 - U_ThScr) * (g * (1 - U_ThScr) / (2 * rho_Mean_Air) * abs(rho_Air - rho_Top))**(1/2)
+def f_ThScr(U_ThScr, K_ThScr, diff_T_AirTop, g, rho_Mean_Air, diff_rho_AirTop):
+    result = U_ThScr * K_ThScr * abs(diff_T_AirTop)**(2/3) + (1 - U_ThScr) * (g * (1 - U_ThScr) / (2 * rho_Mean_Air) * abs(diff_rho_AirTop))**(1/2)
     return result
 
 def MC_AirTop(f_ThScr, CO2_Air, CO2_Top):
@@ -28,10 +28,10 @@ def MC_AirTop_Lin(f_ThScr):
 
 #####
 
-def f_VentRoofSide(C_d, A_Flr, U_Roof, U_Side, A_Roof, A_Side, g, h, h_SideRoof, T_Air, T_Out, T_Mean_Air, C_w, v_Wind):
+def f_VentRoofSide(C_d, A_Flr, U_Roof, U_Side, A_Roof, A_Side, g, h, h_SideRoof, diff_T_AirOut, T_Mean_Air, C_w, v_Wind):
     UA_Roof = U_Roof * A_Roof
     UA_Side = U_Side * A_Side
-    first_ex = UA_Roof**2 * UA_Side**2 * 2 * g * h_SideRoof * (T_Air - T_Out) / (T_Mean_Air * (UA_Roof**2 + UA_Side**2))
+    first_ex = UA_Roof**2 * UA_Side**2 * 2 * g * h_SideRoof * (diff_T_AirOut) / (T_Mean_Air * (UA_Roof**2 + UA_Side**2))
     second_ex = ((UA_Roof + UA_Side) / 2)**2 * C_w * v_Wind**2
     result = C_d / A_Flr * (first_ex + second_ex)**(1/2)
     return result
@@ -63,8 +63,8 @@ def MC_AirOut_Lin(f_VentSide, f_VentForced, CO2_Out):
 
 #####
 
-def ff_VentRoof(C_d, U_Roof, A_Roof, A_Flr, g, h_Roof, T_Air, T_Out, T_Mean_Air, C_w, v_Wind):
-    return C_d * U_Roof * A_Roof / (2 * A_Flr) * (g * h_Roof * (T_Air - T_Out) / (2 * T_Mean_Air) + C_w * v_Wind**2)**(1/2)
+def ff_VentRoof(C_d, U_Roof, A_Roof, A_Flr, g, h_Roof, diff_T_AirOut, T_Mean_Air, C_w, v_Wind):
+    return C_d * U_Roof * A_Roof / (2 * A_Flr) * (g * h_Roof * (diff_T_AirOut) / (2 * T_Mean_Air) + C_w * v_Wind**2)**(1/2)
 
 def f_VentRoof(eta_Roof, eta_Roof_Thr, eta_Side, eta_InsScr, ff_VentRoof, U_ThScr, f_leakage):
     if eta_Roof >= eta_Roof_Thr:
