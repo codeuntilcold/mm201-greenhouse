@@ -12,23 +12,26 @@ def MC_PadAir(U_Pad, phi_Pad, A_Flr, CO2_Out, CO2_Air):
     return (U_Pad * phi_Pad / A_Flr) * (CO2_Out - CO2_Air)
 
 def MC_PadAir_Lin(U_Pad, phi_Pad, A_Flr, CO2_Out):
-    return np.array([ -(U_Pad * phi_Pad / A_Flr), 0, U_Pad * phi_Pad / A_Flr * CO2_Out ])
+    return (U_Pad * phi_Pad / A_Flr) * np.array([ -1, 0, CO2_Out ])
 
 #####
 
 def f_ThScr(U_ThScr, K_ThScr, diff_T_AirTop, g, rho_Mean_Air, diff_rho_AirTop):
-    result = U_ThScr * K_ThScr * abs(diff_T_AirTop)**(2/3) + (1 - U_ThScr) * (g * (1 - U_ThScr) / (2 * rho_Mean_Air) * abs(diff_rho_AirTop))**(1/2)
+    result = U_ThScr * K_ThScr * abs(diff_T_AirTop)**(2/3) + \
+             (1 - U_ThScr) * (g * (1 - U_ThScr) * abs(diff_rho_AirTop) / (2 * rho_Mean_Air))**(1/2)
     return result
 
 def MC_AirTop(f_ThScr, CO2_Air, CO2_Top):
     return (f_ThScr * (CO2_Air - CO2_Top))
 
 def MC_AirTop_Lin(f_ThScr):
-    return np.array([f_ThScr, -f_ThScr, 0])
+    return f_ThScr * np.array([1, -1, 0])
 
 #####
 
-def f_VentRoofSide(C_d, A_Flr, U_Roof, U_Side, A_Roof, A_Side, g, h, h_SideRoof, diff_T_AirOut, T_Mean_Air, C_w, v_Wind):
+def f_VentRoofSide(C_d, A_Flr, U_Roof, U_Side, A_Roof, A_Side, g, h_SideRoof, diff_T_AirOut, T_Mean_Air, C_w, v_Wind):
+    if (A_Roof == 0 and A_Side == 0):
+        return 0
     UA_Roof = U_Roof * A_Roof
     UA_Side = U_Side * A_Side
     first_ex = UA_Roof**2 * UA_Side**2 * 2 * g * h_SideRoof * (diff_T_AirOut) / (T_Mean_Air * (UA_Roof**2 + UA_Side**2))
@@ -59,7 +62,7 @@ def MC_AirOut(f_VentSide, f_VentForced, CO2_Air, CO2_Out):
     return (f_VentSide + f_VentForced) * (CO2_Air - CO2_Out)
 
 def MC_AirOut_Lin(f_VentSide, f_VentForced, CO2_Out):
-    return np.array([ (f_VentSide + f_VentForced), 0, -(f_VentSide + f_VentForced) ])
+    return (f_VentSide + f_VentForced) * np.array([ 1, 0, -CO2_Out ])
 
 #####
 
@@ -81,33 +84,30 @@ def MC_TopOut_Lin(f_VentRoof, CO2_Out):
 
 #####
 
-##### Con dinh nghia P(), nhung ma lay P tu dau ?????
+def Photo_Lin(Res):
+    return np.array([1 / (3 * Res), 0, 0])
 
-def MC_AirCan(M_CH2O, h_CBuf, P, R = 0.0):
-    return M_CH2O * h_CBuf * (P - R)    # R = 0 or R = 1%P
+def MC_AirCan_Lin(M_CH2O, h_CBuf, P, R = 0.0):
+    return M_CH2O * h_CBuf * (P - np.array([0, 0, R]))    # R = 0 or R = 1%P
 
-##### Cong thuc 22, 
- 
-
- 
 ##### Cong thuc 28, 24, 25
 
-e = 2.7
+# e = 2.7
 
-def k_T(T, T_0, k_T0, H_a, R, LAI):
-    return LAI * k_T0 * e**( (-H_a/R) * (1/T - 1/T_0) ) 
+# def k_T(T, T_0, k_T0, H_a, R, LAI):
+#     return LAI * k_T0 * e**( (-H_a/R) * (1/T - 1/T_0) ) 
     
-def f_T(T, T_0, H_d, R, S):
-    return ( 1 + e**(-H_d/R * (1/T_0 - S/H_d))) / ( 1 + e**(-H_d/R * (1/T - S/H_d))) 
+# def f_T(T, T_0, H_d, R, S):
+#     return ( 1 + e**(-H_d/R * (1/T_0 - S/H_d))) / ( 1 + e**(-H_d/R * (1/T - S/H_d))) 
 
-def P_Max(k_T, f_T):
-    return k_T * f_T
+# def P_Max(k_T, f_T):
+#     return k_T * f_T
 
-##### Cong thuc 27, 29
+# ##### Cong thuc 27, 29
 
-def L(L0, K, LAI, m = 0.1):
-    return L0 * (1 - (K * e **(-K * LAI)) / (1 - m))
+# def L(L0, K, LAI, m = 0.1):
+#     return L0 * (1 - (K * e **(-K * LAI)) / (1 - m))
 
-def P_Max_MM(P_MLT, P_Max, L, L05):
-    return P_MLT * P_Max * L / (L + L05)
+# def P_Max_MM(P_MLT, P_Max, L, L05):
+#     return P_MLT * P_Max * L / (L + L05)
 

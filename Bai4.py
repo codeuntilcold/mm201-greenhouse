@@ -13,10 +13,7 @@ def Euler(a, air, top, h, NumOfStep):
         air = AIR
         top = TOP
         i += 1
-    # AIR = AIR[0]        #Lay gia tri CO2-air tai thoi diem cuoi
-    # TOP = TOP[0]        #Lay gia tri CO2-top tai thoi diem cuoi
     return np.array([AIR, TOP])
-
 
 def rk4(a, air, top, h, NumOfStep):
     t = 0
@@ -40,20 +37,39 @@ def rk4(a, air, top, h, NumOfStep):
         air = AIR
         top = TOP
         i += 1
-    # AIR = AIR[0]        #Lay gia tri CO2-air tai thoi diem cuoi
-    # TOP = TOP[0]        #Lay gia tri CO2-top tai thoi diem cuoi
     return np.array([AIR, TOP])
     
-A = Bai3.dx()
-CO2air = 1
-CO2top = 1
-h = 1
-SoStep = 1
-print('================================')
-B = Euler(A, CO2air, CO2top, h, SoStep)
-print('EULER:\t', end='')
-print(B)   
-print('================================')
-B = rk4(A, CO2air, CO2top, h, SoStep)
-print('RK4: \t', end='')
-print(B)
+# A = Bai3.dx()
+A = np.array([[-4.84599885e-02,  4.80036055e-02,  6.62436475e-01],
+              [ 2.32594789e-01, -2.32594790e-01,  6.19319974e-08]])
+
+# print('\n================================')
+
+CO2air = 1078.205
+CO2top = 1141.206
+
+B = np.array([ CO2air, CO2top, 1 ])
+
+print(A @ B)
+print()
+# h = 1
+# SoStep = 900
+
+# print('\n================================')
+# B = Euler(A, CO2air, CO2top, h, SoStep)
+# print('Approx. using Euler:\t', end='')
+# print(B)   
+
+# print('\n================================')
+# B = rk4(A, CO2air, CO2top, h, SoStep)
+# print('Approx. using rk4:  \t', end='')
+# print(B)
+
+
+# x = 599
+# y = 634
+# h = 1
+# NumOfStep = 1
+
+# B = Euler(A, x, y, h, NumOfStep)
+# print(B)
