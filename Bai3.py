@@ -92,4 +92,3 @@ def dx():
     result = np.array([(BlowAir + ExtAir + PadAir - AirOut - AirTop - AirCan) / cap_CO2_Air, (AirTop - TopOut) / cap_CO2_Top])    
     return result
 
-

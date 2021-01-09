@@ -1,4 +1,6 @@
 import numpy as np
+from matplotlib import pyplot as plt
+
 
 e = 2.7
 
@@ -59,6 +61,8 @@ def f_ThScr(U_ThScr, K_ThScr, T_Air, T_Top, g, rho_Mean_Air, rho_Air, rho_Top):
     return result
 
 def f_VentRoofSide(C_d, A_Flr, U_Roof, U_Side, A_Roof, A_Side, g, h, h_SideRoof, T_Air, T_Out, T_Mean_Air, C_w, v_Wind):
+    if (A_Roof == 0 and A_Side == 0):
+        return 0
     UA_Roof = U_Roof * A_Roof
     UA_Side = U_Side * A_Side
     first_ex = UA_Roof**2 * UA_Side**2 * 2 * g * h_SideRoof * (T_Air - T_Out) / (T_Mean_Air * (UA_Roof**2 + UA_Side**2))
@@ -165,6 +169,7 @@ def dx():
     h_Air               = float(input('Enter h_Air               : '))
     R                   = float(input('Enter R                   : '))
     T_Air               = float(input('Enter T_Air               : '))
+    RH_Air              = float(input('Enter RH_Air              : '))
     h_Top               = float(input('Enter h_Top               : '))
     T_Top               = T_Air + 1
     
@@ -195,8 +200,8 @@ def dx():
     
     #Can
     
-    VP_Air_0            = float(input('Enter VP_Air_0            : '))
-    VP_Can              = float(input('Enter VP_Can              : '))
+    VP_Air_0            = VP_Air(T_Air, RH_Air)
+    VP_Can_             = VP_Can(T_Air + 1)
     r_smin              = float(input('Enter r_smin              : '))
     c_pAir              = float(input('Enter c_p,Air             : '))
     LAI                 = float(input('Enter LAI                 : '))
@@ -207,7 +212,7 @@ def dx():
     r_s                 = r_smin
     VEC                 = VEC_CanAir(Rho_Air, c_pAir, LAI, Delta_H, gamma, r_b, r_s)
     
-    CanAir = np.array([-VEC, 0, VEC * VP_Can])
+    CanAir = np.array([-VEC, 0, VEC * VP_Can_])
     
     #FogAir
     
@@ -302,7 +307,7 @@ def dx():
         AirMech = np.array([0, 0, 0])
     else:
         HEC_MechAir_    = HEC_MechAir(U_MechCool, COP_MechCool, P_MechCool, T_Air, T_MechCool, Delta_H, VP_Air_0, VP_MechCool)
-        AirMech_        = MV_AirMech(VP_Air_0, VP_MechCool, HEC_MechAir_)
+        # AirMech_        = MV_AirMech(VP_Air_0, VP_MechCool, HEC_MechAir_)
         AirMech         = np.array([cst * HEC_MechAir_, 0, -cst * HEC_MechAir_ * VP_MechCool]) 
     
 #####
@@ -382,10 +387,14 @@ def rk4(a, air, top, h, NumOfStep):
     return np.array([AIR, TOP])
     
 A = dx()
-VPair = 1
-VPtop = 1
+print('================================')
+print(A)   
+
+VPair = 490
+VPtop = 490
 h = 1
 SoStep = 1
+
 print('================================')
 B = Euler(A, VPair, VPtop, h, SoStep)
 print('EULER:\t', end='')
@@ -395,3 +404,27 @@ B = rk4(A, VPair, VPtop, h, SoStep)
 print('RK4: \t', end='')
 print(B)
     
+############ PLOTTING ###############
+
+# require a 'static' A
+
+# eu_result = []
+# rk_result = []
+
+# VPair_e = VPair_r = VPtop_e = VPtop_r = 490
+
+# for nstep in range(300):
+#     B = Euler(A, VPair_e, VPtop_e, h, nstep)
+#     VPair_e, VPtop_e = B
+#     eu_result.append(VPtop_e)
+#     B = rk4(A, VPair_r, VPtop_r, h, nstep)
+#     VPair_r, VPtop_r = B
+#     rk_result.append(VPtop_r)
+
+# plt.plot(eu_result, '-', label='Euler', linewidth=2)
+# plt.plot(rk_result, 'r--', label='rk4', linewidth=2)
+# plt.legend()
+# plt.show()
+
+
+
